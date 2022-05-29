@@ -41,6 +41,45 @@
         <div class="mb-4">
           <label class="input__label">Email</label>
           <div class="form__field relative">
+            <input v-model="formLogin.email" class="input__field" type="text" placeholder="bruce.wayne@imnotbatman.org">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="input__label">Password</label>
+          <div class="form__field relative">
+            <input v-model="formLogin.password" class="input__field" type="password" placeholder="*********">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="input__label">Remember Me</label>
+          <toggle-input v-model="formLogin.rememberMe"></toggle-input>
+        </div>
+        <div class="mb-4">
+          <button class="btn btn-primary mr-3 w-full">Login</button>
+        </div>
+      </form>
+    </modal>
+
+    <modal :show="modals.register" @close-modal="closeModalRegister">
+      <h2 class="text-grey-darkest font-semibold text-center mb-6">
+        Register to Platzi Rooms
+      </h2>
+      <form>
+        <div class="mb-4">
+          <label class="input__label">Name</label>
+          <div class="form__field relative">
+            <input class="input__field" type="text" placeholder="Bruce">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="input__label">Surname</label>
+          <div class="form__field relative">
+            <input class="input__field" type="text" placeholder="Wayne">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="input__label">Email</label>
+          <div class="form__field relative">
             <input class="input__field" type="text" placeholder="bruce.wayne@imnotbatman.org">
           </div>
         </div>
@@ -51,7 +90,13 @@
           </div>
         </div>
         <div class="mb-4">
-          <button class="btn btn-primary mr-3 w-full">Login</button>
+          <label class="input__label">Repeat Password</label>
+          <div class="form__field relative">
+            <input class="input__field" type="password" placeholder="*********">
+          </div>
+        </div>
+        <div class="mb-4">
+          <button class="btn btn-primary mr-3 w-full">Register</button>
         </div>
       </form>
     </modal>
@@ -64,9 +109,19 @@ import { mapGetters } from 'vuex';
 import HeaderPartial from '@/partials/HeaderPartial.vue';
 import FooterPartial from '@/partials/FooterPartial.vue';
 import Modal from '@/components/Modal.vue';
+import ToggleInput from '@/components/ToggleInput.vue';
 
 export default {
   name: 'DefaultLayout',
+  data() {
+    return {
+      formLogin: {
+        email: '',
+        password: '',
+        rememberMe: '',
+      },
+    };
+  },
   computed: {
     ...mapGetters([
       'modals',
@@ -76,11 +131,18 @@ export default {
     HeaderPartial,
     FooterPartial,
     Modal,
+    ToggleInput,
   },
   methods: {
     closeModal() {
       this.$store.dispatch('TOGGLE_MODAL_STATE', {
         name: 'login',
+        value: false,
+      });
+    },
+    closeModalRegister() {
+      this.$store.dispatch('TOGGLE_MODAL_STATE', {
+        name: 'register',
         value: false,
       });
     },
