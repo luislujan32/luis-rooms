@@ -1,18 +1,6 @@
 <template>
   <default-layout>
     <section class="container py-6">
-      <h1 class="text-3xl font-light text-grey-darkest mb-3">Recommended</h1>
-      <div class="section">
-        <tiny-slider>
-          <div class="slider-item">1</div>
-          <div class="slider-item">2</div>
-          <div class="slider-item">3</div>
-          <div class="slider-item">4</div>
-          <div class="slider-item">5</div>
-        </tiny-slider>
-      </div>
-    </section>
-    <section class="container py-6">
       <h1 class="text-3xl font-light text-grey-darkest mb-3">Explore</h1>
       <div class="section__explore grid-container mb-8">
         <div class="house__card mb-3" v-for="room in rooms" :key="room['.key']">
@@ -31,9 +19,10 @@
         </div>
       </div>
       <div class="text-center">
-        <a
+        <router-link
+          :to="{ name: 'SearchPage' }"
           class="py-3 px-12 bg-yellow-dark no-underline text-yellow-darker text-lg rounded"
-          href="#">Show all</a>
+          >Show all</router-link>
       </div>
     </section>
   </default-layout>
@@ -42,7 +31,6 @@
 <script>
 import { mapGetters } from 'vuex';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import TinySlider from '@/components/TinySlider.vue';
 
 export default {
   name: 'HomePage',
@@ -56,7 +44,6 @@ export default {
   },
   components: {
     DefaultLayout,
-    TinySlider,
   },
 };
 </script>

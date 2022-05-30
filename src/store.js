@@ -59,8 +59,7 @@ export default new Vuex.Store({
       });
     },
     FETCH_ROOMS: ({ state, commit }, limit) => new Promise((resolve) => {
-      const db = getDatabase();
-      let instance = ref(db, 'rooms');
+      let instance = ref(getDatabase(), 'rooms');
       if (limit) {
         instance = query(instance, limitToFirst(limit));
       }
@@ -71,6 +70,18 @@ export default new Vuex.Store({
           commit('SET_ITEM', { resource: 'rooms', id: roomId, item: room });
         });
         resolve(Object.values(state.rooms));
+      });
+    }),
+    FETCH_SERVICES: ({ state, commit }) => new Promise((resolve) => {
+      const instance = ref(getDatabase(), 'services');
+
+      onValue(instance, (snapshot) => {
+        const services = snapshot.val();
+        Object.keys(services).forEach((serviceId) => {
+          const service = services[serviceId];
+          commit('SET_ITEM', { resource: 'services', id: serviceId, item: service });
+        });
+        resolve(Object.values(state.services));
       });
     }),
     FETCH_USER: ({ state, commit }, { id }) => new Promise((resolve) => {
@@ -115,6 +126,7 @@ export default new Vuex.Store({
       return (state.authId) ? state.users[state.authId] : null;
     },
     rooms: state => state.rooms,
+    services: state => state.services,
     userRoomsCount: state => id => countObjectProperties(state.users[id].rooms),
   },
 });
