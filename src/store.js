@@ -1,8 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {
-  getDatabase, ref, onValue, query, limitToFirst, child, get, push, update,
+  getDatabase, ref, onValue, query, limitToFirst, child, get, push, update, set,
 } from 'firebase/database';
+import {
+  getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut,
+} from 'firebase/auth';
 import countObjectProperties from './utils';
 
 Vue.use(Vuex);
@@ -12,7 +15,7 @@ export default new Vuex.Store({
     users: {},
     services: {},
     rooms: {},
-    authId: '38St7Q8Zi2N1SPa5ahzssq9kbyp1',
+    authId: null,
     modals: {
       login: false,
       register: false,
@@ -33,9 +36,9 @@ export default new Vuex.Store({
       newItem['.key'] = id;
       Vue.set(state[resource], id, newItem);
     },
-    // SET_AUTHID(state, id) {
-    //   state.authId = id;
-    // },
+    SET_AUTHID(state, id) {
+      state.authId = id;
+    },
   },
   actions: {
     TOGGLE_MODAL_STATE: ({ commit }, { name, value }) => {
@@ -91,7 +94,27 @@ export default new Vuex.Store({
         resolve(state.users[id]);
       });
     }),
-    // CREATE_USER: ({ state, commit }, { email, name, password }) => new Promise((resolve) => {
+    CREATE_USER: ({ state, commit }, { email, name, password }) => new Promise((resolve) => {
+      createUserWithEmailAndPassword(getAuth(), email, password).then((userCredential) => {
+        const id = userCredential.user.uid;
+        const registeredAt = Math.floor(Date.now() / 1000);
+        const newUser = { email, name, registeredAt };
+
+        // const updates = {};
+        // updates[`users/${id}`] = newUser;
+        // update(ref(getDatabase()), updates).then(() => {
+        //   commit('SET_ITEM', { resource: 'users', id, item: newUser });
+        //   resolve(state.users[id]);
+        // });
+        const dbRef = ref(getDatabase());
+        set(child(dbRef, `users/${id}`), newUser).then(() => {
+          commit('SET_ITEM', { resource: 'users', id, item: newUser });
+          resolve(state.users[id]);
+        });
+      });
+    }),
+    // ////////////////
+    // CREATE_USER_OLD: ({ state, commit }, { email, name, password }) => new Promise((resolve) => {
     //   firebase.auth().createUserWithEmailAndPassword(email, password).then((account) => {
     //     const id = account.user.uid;
     //     const registeredAt = Math.floor(Date.now() / 1000);
@@ -103,22 +126,25 @@ export default new Vuex.Store({
     //       });
     //   });
     // }),
-    // FETCH_AUTH_USER: ({ dispatch, commit }) => {
-    //   const userId = firebase.auth().currentUser.uid;
-    //   return dispatch('FETCH_USER', { id: userId })
-    //     .then(() => {
-    //       commit('SET_AUTHID', userId);
-    //     });
-    // },
-    // SIGN_IN(context, { email, password }) {
-    //   return firebase.auth().signInWithEmailAndPassword(email, password);
-    // },
-    // LOG_OUT({ commit }) {
-    //   firebase.auth().signOut()
-    //     .then(() => {
-    //       commit('SET_AUTHID', null);
-    //     });
-    // },
+    // ////////////////
+    FETCH_AUTH_USER: ({ dispatch, commit }) => {
+      const auth = getAuth();
+      onAuthStateChanged(auth, (user) => {
+        const userId = user.uid;
+        return dispatch('FETCH_USER', { id: userId })
+          .then(() => {
+            commit('SET_AUTHID', userId);
+          });
+      });
+    },
+    SIGN_IN(context, { email, password }) {
+      return signInWithEmailAndPassword(getAuth(), email, password);
+    },
+    LOG_OUT({ commit }) {
+      signOut(getAuth()).then(() => {
+        commit('SET_AUTHID', null);
+      });
+    },
   },
   getters: {
     modals: state => state.modals,

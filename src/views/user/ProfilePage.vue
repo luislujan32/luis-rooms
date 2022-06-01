@@ -119,6 +119,7 @@ export default {
       user: 'authUser',
     }),
     userRoomCounts() {
+      console.log('user', this.user);
       return this.$store.getters.userRoomsCount(this.user['.key']);
     },
   },

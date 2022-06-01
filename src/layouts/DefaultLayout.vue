@@ -33,11 +33,11 @@
     <footer-partial></footer-partial>
 
     <!-- Modals -->
-    <modal :show="modals.login" @close-modal="closeModal">
+    <modal :show="modals.login" @close-modal="closeModalLogin">
       <h2 class="text-grey-darkest font-semibold text-center mb-6">
         Welcome to Platzi Rooms
       </h2>
-      <form>
+      <form @submit.prevent="loginrHandlerSubmit">
         <div class="mb-4">
           <label class="input__label">Email</label>
           <div class="form__field relative">
@@ -64,35 +64,23 @@
       <h2 class="text-grey-darkest font-semibold text-center mb-6">
         Register to Platzi Rooms
       </h2>
-      <form>
+      <form @submit.prevent="registerHandlerSubmit">
         <div class="mb-4">
           <label class="input__label">Name</label>
           <div class="form__field relative">
-            <input class="input__field" type="text" placeholder="Bruce">
-          </div>
-        </div>
-        <div class="mb-4">
-          <label class="input__label">Surname</label>
-          <div class="form__field relative">
-            <input class="input__field" type="text" placeholder="Wayne">
+            <input v-model="formRegister.name" class="input__field" type="text" placeholder="Bruce">
           </div>
         </div>
         <div class="mb-4">
           <label class="input__label">Email</label>
           <div class="form__field relative">
-            <input class="input__field" type="text" placeholder="bruce.wayne@imnotbatman.org">
+            <input v-model="formRegister.email" class="input__field" type="text" placeholder="bruce.wayne@imnotbatman.org">
           </div>
         </div>
         <div class="mb-4">
           <label class="input__label">Password</label>
           <div class="form__field relative">
-            <input class="input__field" type="password" placeholder="*********">
-          </div>
-        </div>
-        <div class="mb-4">
-          <label class="input__label">Repeat Password</label>
-          <div class="form__field relative">
-            <input class="input__field" type="password" placeholder="*********">
+            <input v-model="formRegister.password" class="input__field" type="password" placeholder="*********">
           </div>
         </div>
         <div class="mb-4">
@@ -100,7 +88,6 @@
         </div>
       </form>
     </modal>
-
   </div>
 </template>
 
@@ -120,6 +107,11 @@ export default {
         password: '',
         rememberMe: '',
       },
+      formRegister: {
+        name: '',
+        email: '',
+        password: '',
+      },
     };
   },
   computed: {
@@ -134,7 +126,7 @@ export default {
     ToggleInput,
   },
   methods: {
-    closeModal() {
+    closeModalLogin() {
       this.$store.dispatch('TOGGLE_MODAL_STATE', {
         name: 'login',
         value: false,
@@ -144,6 +136,19 @@ export default {
       this.$store.dispatch('TOGGLE_MODAL_STATE', {
         name: 'register',
         value: false,
+      });
+    },
+    loginrHandlerSubmit() {
+      this.$store.dispatch('SIGN_IN', {
+        email: this.formLogin.email,
+        password: this.formLogin.password,
+      }).then(() => {
+        this.closeModalLogin();
+      });
+    },
+    registerHandlerSubmit() {
+      this.$store.dispatch('CREATE_USER', this.formRegister).then(() => {
+        this.closeModalRegister();
       });
     },
   },
